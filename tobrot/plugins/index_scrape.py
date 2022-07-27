@@ -95,6 +95,7 @@ async def index_scrape(client, message):
         txt = reply_to.text
     else:
         txt = ""
+    url = ""
     if txt != "":
         _lin = txt.split("\n")
         url = _lin[0].stripe()
@@ -109,10 +110,12 @@ async def index_scrape(client, message):
             username="none"
             password="none"
             pass
+    else:
+        await lm.edit_text("`Not Provided URL to Scrape`")
     x = 0
     global body_text 
-
-    body_text = f"<i>🔗 Raw Index Link :</i> <a href='{url}'>Click Here</a> <br>"
+    if url:
+        body_text = f"<i>🔗 Raw Index Link :</i> <a href='{url}'>Click Here</a> <br>"
     if username != "none" and password != "none":
         cpass = ""
         cname = ""
@@ -134,5 +137,3 @@ async def index_scrape(client, message):
     await lm.delete()
     await message.reply_text(tgh_link) #ToDo
     
-
-
