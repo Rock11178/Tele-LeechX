@@ -58,8 +58,8 @@ def scrapeURL(payload_input, url, username, password):
             files_name = deResp["data"]["files"][i]["name"] 
             if files_type == "application/vnd.google-apps.folder": 
                 ddl = url + q(file_name) + "/"
-                scpText += "Directory : {ddl}")
-                scrapeURL(payload, ddl))
+                scpText += "Directory : {ddl}"
+                scrapeURL(payload, ddl)
             else:
                 direct_download_link = url + q(files_name)
                 no = i + 1
