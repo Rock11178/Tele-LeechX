@@ -178,6 +178,7 @@ MEDIAINFO_CMD = os.environ.get("MEDIAINFO_CMD", "mediainfo")
 CAP_STYLE = os.environ.get("CAP_STYLE", "code")
 BOT_NO = os.environ.get("BOT_NO", "")
 USER_DTS = os.environ.get("USER_DTS", True)
+INDEX_SCRAPE = os.environ.get("INDEX_SCRAPE", "indexscrape")
 
 #Bot Command [Token Utils]  >>>>>>>>>>>
 UPTOBOX_TOKEN = os.environ.get("UPTOBOX_TOKEN", "")
