@@ -136,7 +136,7 @@ async def upload_to_tg(
         sizze = os.path.getsize(local_file_name)
         if sizze > TG_MAX_FILE_SIZE and sizze < TG_PRM_FILE_SIZE and isUserPremium and (not IS_RETRT):
             LOGGER.info(f"User Type : Premium ({from_user})")
-            sent_message = await upload_single_file(
+            sent_message, idCheck = await upload_single_file(
                 message,
                 local_file_name,
                 caption_str,
@@ -147,9 +147,14 @@ async def upload_to_tg(
                 True
             )
             if sent_message is not None:
-                dict_contatining_uploaded_files[
-                    os.path.basename(local_file_name)
-                ] = sent_message.id
+                if idCheck:
+                    dict_contatining_uploaded_files[
+                        os.path.basename(local_file_name)
+                    ] = sent_message.message_id
+                elif (not idCheck):
+                    dict_contatining_uploaded_files[
+                        os.path.basename(local_file_name)
+                    ] = sent_message.id
             else:
                 return
         elif os.path.getsize(local_file_name) > TG_MAX_FILE_SIZE:
@@ -183,7 +188,7 @@ async def upload_to_tg(
         else:
             sizze = os.path.getsize(local_file_name)
             LOGGER.info("Files Less Than 2 GB")
-            sent_message = await upload_single_file(
+            sent_message, _ = await upload_single_file(
                 message,
                 local_file_name,
                 caption_str,
@@ -360,6 +365,7 @@ IMAGE_SUFFIXES = ("JPG", "JPX", "PNG", "WEBP", "CR2", "TIF", "BMP", "JXR", "PSD"
 async def upload_single_file(
     message, local_file_name, caption_str, from_user, client, edit_media, yt_thumb, prm_atv: bool
 ):
+    idc = False
     base_file_name = os.path.basename(local_file_name)
     await asyncio.sleep(EDIT_SLEEP_TIME_OUT)
     local_file_name = str(Path(local_file_name).resolve())
@@ -457,6 +463,7 @@ async def upload_single_file(
                         parse_mode=ParseMode.HTML,
                         reply_to_message_id=message.id
                     )
+                    idc = True
             LOGGER.info("Bot 4GB Upload : Completed")
         else:
             sent_message = await bot.send_document(
@@ -646,6 +653,7 @@ async def upload_single_file(
                                     parse_mode=ParseMode.HTML,
                                     reply_to_message_id=message.id
                                 )
+                                idc = True
                         LOGGER.info("Bot 4GB Upload : Completed")
                     else:
                         sent_message = await message.sent_video(
@@ -866,4 +874,4 @@ async def upload_single_file(
                     LOGGER.warning(str(rr))
                     await asyncio.sleep(5)
         os.remove(local_file_name)
-    return sent_message
+    return sent_message, idc
