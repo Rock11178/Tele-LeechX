@@ -73,7 +73,7 @@ def scrapeURL(payload_input, url, username, password):
                 try:
                     files_time   = deResp["data"]["files"][i]["modifiedTime"] 
                     if files_time:
-	                scpText += "| ⏰ Modified Time : {files_time}<br><br>"
+                        scpText += "| ⏰ Modified Time : {files_time}<br><br>"
 	        except:
                     pass
             scpText += "</pre>"
