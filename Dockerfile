@@ -9,16 +9,12 @@ ENV TZ=Asia/Kolkata
 
 RUN apt -qq update --fix-missing && \
     apt -qq upgrade && \
-    apt -qq install -y git \
-    aria2 \
-    wget \
-    curl \
+    apt -qq install -y curl \
     busybox \
     unzip \
     unrar \
     tar \
     python3 \
-    ffmpeg \
     python3-pip \
     p7zip-full \
     p7zip-rar \
