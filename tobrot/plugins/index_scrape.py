@@ -49,34 +49,34 @@ def scrapeURL(payload_input, url, username, password):
    
     if list(deResp.get("data").keys())[0] == "error": 
         return "Nothing Found"
-    else :
+    else:
         file_length = len(deResp["data"]["files"])
         scpText += f"🗄 <i><b>Total Files :</b></i> {file_length}<br><br>"
         for i, _ in enumerate(range(file_length)):
-         
-	    files_type = deResp["data"]["files"][i]["mimeType"]
-	    files_name = deResp["data"]["files"][i]["name"] 
-	    if files_type == "application/vnd.google-apps.folder": 
+        
+            files_type = deResp["data"]["files"][i]["mimeType"]
+            files_name = deResp["data"]["files"][i]["name"] 
+            if files_type == "application/vnd.google-apps.folder": 
                 ddl = url + q(file_name) + "/"
-	        scpText += "Directory : {ddl}")
-	        scrapeURL(payload, ddl))
-	    else:
-	        direct_download_link = url + q(files_name)
-	        no = i + 1
-	        scpText += f"📄 <strong>{no}. {files_name}</strong> : <br><br><pre>🔖 Index Link : <a href='{direct_download_link}'>Index Link</a><br>"
+                scpText += "Directory : {ddl}")
+                scrapeURL(payload, ddl))
+            else:
+                direct_download_link = url + q(files_name)
+                no = i + 1
+                scpText += f"📄 <strong>{no}. {files_name}</strong> : <br><br><pre>🔖 Index Link : <a href='{direct_download_link}'>Index Link</a><br>"
                 try:
-	            files_size = deResp["data"]["files"][i]["size"]
-	            if files_size:
-	                scpText += "<br>📂 Size : {humanbytes(files_size)} | 📋 Type : {files_type} "
+                    files_size = deResp["data"]["files"][i]["size"]
+                    if files_size:
+                        scpText += "<br>📂 Size : {humanbytes(files_size)} | 📋 Type : {files_type} "
                 except:
                     pass
                 try:
-	            files_time   = deResp["data"]["files"][i]["modifiedTime"] 
-	            if files_time:
+                    files_time   = deResp["data"]["files"][i]["modifiedTime"] 
+                    if files_time:
 	                scpText += "| ⏰ Modified Time : {files_time}<br><br>"
 	        except:
                     pass
-	    scpText += "</pre>"
+            scpText += "</pre>"
         return scpText
 	        
 	
@@ -124,9 +124,9 @@ async def index_scrape(client, message):
     body_text += str(scrapeURL(payload, url, username, password))
 	
     while nexPage == True: #Not to be Executed 
-	payload = {"page_index":nexPageToken, "page_index": x}
-	print(scrapeURL(payload, url, username, password))
-	x += 1
+        payload = {"page_index":nexPageToken, "page_index": x}
+        print(scrapeURL(payload, url, username, password))
+        x += 1
     
     title = "Index Link Scrapper"
     tgh_link = post_to_telegraph(title, body_text)
