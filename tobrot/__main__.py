@@ -481,7 +481,7 @@ if __name__ == "__main__":
     ##############################################################################
     ind_scrape_handler = MessageHandler(
         index_scrape,
-        filters=filters.command(["f{INDEX_SCRAPE}", f"{INDEX_SCRAPE}@{bot.username}"])
+        filters=filters.command([f"{INDEX_SCRAPE}", f"{INDEX_SCRAPE}@{bot.username}"])
         & filters.chat(chats=AUTH_CHANNEL),
     )
     app.add_handler(ind_scrape_handler)
