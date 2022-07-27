@@ -6,6 +6,7 @@ from urllib.parse import quote as q
 
 from tobrot import LOGGER, INDEX_SCRAPE
 from tobrot.helper_funcs.display_progress import humanbytes
+from tobrot.plugins.mediainfo import post_to_telegraph
 
 nexPage = False #ToDo
 nexPageToken = "" 
@@ -67,10 +68,10 @@ def scrapeURL(payload_input, url, username, password):
 	            files_size = deResp["data"]["files"][i]["size"]
 	            if files_size:
 	                scpText += "<br>📂 Size : {humanbytes(files_size)} | 📋 Type : {files_type} "
-	            files_time   = deResp["data"]["files"][i]["modifiedTime"] 
                 except:
                     pass
                 try:
+	            files_time   = deResp["data"]["files"][i]["modifiedTime"] 
 	            if files_time:
 	                scpText += "| ⏰ Modified Time : {files_time}<br><br>"
 	        except:
@@ -79,30 +80,59 @@ def scrapeURL(payload_input, url, username, password):
         return scpText
 	        
 	
-def index_scrape(url, username="none", password="none"):
+async def index_scrape(client, message):
+    '''  /indexscape <link>\n username\n password uscommand '''
+    lm = await message.reply_text(
+        text="`Scrapping Down ...`",
+    )
+    user_id_ = message.from_user.id 
+    u_men = message.from_user.mention
+    _send = message.text.split(" ", maxsplit=1)
+    reply_to = message.reply_to_message
+    if len(_send) > 1:
+        txt = _send[1]
+    elif reply_to is not None:
+        txt = reply_to.text
+    else:
+        txt = ""
+    if txt != "":
+        _lin = txt.split("\n")
+        url = _lin[0].stripe()
+        try:
+            username = _lin[1]
+            password = _lin[2]
+            #try: await message.delete()
+            #except: pass
+            #try: await message.reply_to_message.delete()
+            #except: pass
+        except:
+            username="none"
+            password="none"
+            pass
     x = 0
     global body_text 
+
     body_text = f"<i>🔗 Raw Index Link :</i> <a href='{url}'>Click Here</a> <br>"
     if username != "none" and password != "none":
-        body_text += "<i>👤 Username :</i> ****** <br><i>📟 Password :</i> ******<br><hr><br>"
+        cpass = ""
+        cname = ""
+        for p in range(0, len(password)): cpass += "*"
+        for n in range(0, len(username)): cname += "*"
+        body_text += f"<i>👤 Username :</i> {cname} <br><i>📟 Password :</i> {cpass} <br><hr><br>"
     payload = {"page_token":nexPageToken, "page_index": x}	
     LOGGER.info(f"Index Scrape Link: {url}")
     body_text += str(scrapeURL(payload, url, username, password))
 	
-    while nexPage == True:
+    while nexPage == True: #Not to be Executed 
 	payload = {"page_index":nexPageToken, "page_index": x}
 	print(scrapeURL(payload, url, username, password))
 	x += 1
+    
+    title = "Index Link Scrapper"
+    tgh_link = post_to_telegraph(title, body_text)
 
-index_scrape(url=index_link, username=username, password=password)
+    await lm.delete()
+    await message.reply_text(tgh_link) #ToDo
+    
 
-'''
-telegraph = Telegraph()
-telegraph.create_account(short_name='mystery')
-response = telegraph.create_page(
-    title= "Index Link Scrapper",
-    html_content=body_text,
-    author_name='Tele-LeechX',
-    author_url='https://t.me/FXTorrentz'
-)
-'''
+
