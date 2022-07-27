@@ -67,7 +67,8 @@ from tobrot import (
     STRING_SESSION,
     SET_BOT_COMMANDS,
     RDM_QUOTE,
-    STATS_COMMAND
+    STATS_COMMAND,
+    INDEX_SCRAPE
 )
 if STRING_SESSION:
     from tobrot import userBot
@@ -75,6 +76,7 @@ from tobrot.helper_funcs.download import down_load_media_f
 from tobrot.helper_funcs.direct_link_generator import url_link_generate
 from tobrot.helper_funcs.download_aria_p_n import aria_start
 from tobrot.plugins import *
+from tobrot.plugins.index_scrape import index_scrape
 from tobrot.plugins.call_back_button_handler import button
 from tobrot.plugins.imdb import imdb_search, imdb_callback 
 from tobrot.plugins.torrent_search import searchhelp, sendMessage 
@@ -476,6 +478,13 @@ if __name__ == "__main__":
         & filters.chat(chats=AUTH_CHANNEL),
     )
     app.add_handler(template_handler)
+    ##############################################################################
+    ind_scrape_handler = MessageHandler(
+        index_scrape,
+        filters=filters.command(["f{INDEX_SCRAPE}", f"{INDEX_SCRAPE}@{bot.username}"])
+        & filters.chat(chats=AUTH_CHANNEL),
+    )
+    app.add_handler(ind_scrape_handler)
     ##############################################################################
 
         #$$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\ $$$$$$\   
