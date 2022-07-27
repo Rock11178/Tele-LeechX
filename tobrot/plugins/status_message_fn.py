@@ -129,6 +129,8 @@ async def status_message_f(
             msg = f"\n┏━━━━━━━━━━━━━━━╻\n┃\n┃ ⚠️ <b>No Active, Queued or Paused \n┃ Torrents / Direct Links ⚠️</b>\n┃\n┗━♦️ℙ𝕠𝕨𝕖𝕣𝕖𝕕 𝔹𝕪 {UPDATES_CHANNEL}♦️━╹\n"
             msg = mssg + "\n" + msg + "\n" + ms_g
             await to_edit.edit(msg)
+            await asyncio.sleep(EDIT_SLEEP_TIME_OUT)
+            await to_edit.delete()
             break
         msg = mssg + "\n" + msg + "\n" + ms_g
         if len(msg) > MAX_MESSAGE_LENGTH:  # todo - will catch later
