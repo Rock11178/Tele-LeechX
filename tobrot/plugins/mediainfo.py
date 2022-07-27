@@ -74,6 +74,7 @@ async def mediainfo(client, message):
         if reply_to.media:
             for kind in available_media:
                 x_media = getattr(reply_to, kind, None)
+                LOGGER.info(x_media)
                 if x_media is not None:
                     TG_MEDIA = True
                     break
@@ -93,6 +94,7 @@ async def mediainfo(client, message):
 
     if TG_MEDIA:
         media_type = str(type(x_media)).split("'")[1]
+        LOGGER.info(media_type)
         file_path = safe_filename(await reply_to.download())
         output_ = await runcmd(f'mediainfo "{file_path}"')
     elif DIRECT_LINK:
@@ -114,6 +116,7 @@ async def mediainfo(client, message):
 
     if TG_MEDIA:
         text_ = media_type.split(".")[-1]
+        LOGGER.info(text_)
         textup = f"""
 ℹ️ <code>MEDIA INFO</code> ℹ
 ┃
