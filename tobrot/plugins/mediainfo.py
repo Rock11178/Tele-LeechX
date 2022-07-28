@@ -106,8 +106,8 @@ async def mediainfo(client, message):
     process = await message.reply_text("`Gᴇɴᴇʀᴀᴛɪɴɢ ...`")
 
     if TG_MEDIA:
-        media_type = str(x_media).split("'")[1]
-        LOGGER.info(media_type)
+        #media_type = str(type(x_media)).split("'")[1]
+        #LOGGER.info(media_type)
         file_path = safe_filename(await reply_to.download())
         output_ = await runcmd(f'mediainfo "{file_path}"')
     elif DIRECT_LINK:
@@ -128,7 +128,7 @@ async def mediainfo(client, message):
     tgh_link = post_to_telegraph_html(title, body_text)
 
     if TG_MEDIA:
-        text_ = media_type.split(".")[-1]
+        #text_ = media_type.split(".")[-1]
         LOGGER.info(text_)
         textup = f"""
 ℹ️ <code>MEDIA INFO</code> ℹ
@@ -138,7 +138,7 @@ async def mediainfo(client, message):
 ┃• <b>File Size :</b> <code>{humanbytes(x_media['file_size'])}</code>
 ┃• <b>Date :</b> <code>{datetime.datetime.utcfromtimestamp(x_media['date']).strftime('%I:%M:%S %p %d %B, %Y')}</code>
 ┃• <b>File ID :</b> <code>{x_media['file_id']}</code>
-┃• <b>Media Type :</b> <code>{text_}</code>
+┃• <b>Media Type :</b> <code>None</code>
 ┃
 ┗━♦️ℙ𝕠𝕨𝕖𝕣𝕖𝕕 𝔹𝕪 {UPDATES_CHANNEL}♦️━╹
 """
