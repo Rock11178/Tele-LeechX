@@ -110,9 +110,7 @@ async def mediainfo(client, message):
         output_ = await runcmd(f'mediainfo "{file_path}"')
     elif DIRECT_LINK:
         output_ = await runcmd(f'mediainfo "{link}" --Ssl_IgnoreSecurity')
-    out = None
-    if len(output_) != 0:
-        out = output_[0]
+    out = output_[0] if len(output_) != 0 else None
     if DIRECT_LINK:
         out = out.replace("\n", "<br>")
     body_text = f"""
@@ -120,10 +118,7 @@ async def mediainfo(client, message):
 <pre>{out or 'Not Supported'}</pre>
 """
     LOGGER.info(out)
-    if DIRECT_LINK:
-        title = unquote(link.split('/')[-1])
-    else:
-        title = "FX Mediainfo"
+    title = unquote(link.split('/')[-1]) if DIRECT_LINK else "FX Mediainfo"
     tgh_link = post_to_telegraph_html(title, body_text)
 
     if TG_MEDIA:

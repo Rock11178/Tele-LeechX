@@ -66,11 +66,10 @@ async def status_message_f(
     async with _lock:
         if len(gid_dict[chat_id]) == 0:
             gid_dict[chat_id].append(mess_id)
-        else:
-            if not mess_id in gid_dict[chat_id]:
-                await client.delete_messages(chat_id, gid_dict[chat_id])
-                gid_dict[chat_id].pop()
-                gid_dict[chat_id].append(mess_id)
+        elif mess_id not in gid_dict[chat_id]:
+            await client.delete_messages(chat_id, gid_dict[chat_id])
+            gid_dict[chat_id].pop()
+            gid_dict[chat_id].append(mess_id)
 
     prev_mess = "By gautamajay52"
     await message.delete()
@@ -91,14 +90,28 @@ async def status_message_f(
                     msgg = f"┣🔰𝐒𝐞𝐞𝐝𝐬: <code>{file.num_seeders}</code> ┃ 🔰𝐏𝐞𝐞𝐫𝐬: <code>{file.connections}</code>"
 
                 percentage = int(file.progress_string(0).split('%')[0])
-                prog = "[{0}{1}]".format("".join([FINISHED_PROGRESS_STR for i in range(math.floor(percentage / 5))]),"".join([UN_FINISHED_PROGRESS_STR for i in range(20 - math.floor(percentage / 5))]))
+                prog = "[{0}{1}]".format(
+                    "".join(
+                        [
+                            FINISHED_PROGRESS_STR
+                            for _ in range(math.floor(percentage / 5))
+                        ]
+                    ),
+                    "".join(
+                        [
+                            UN_FINISHED_PROGRESS_STR
+                            for _ in range(20 - math.floor(percentage / 5))
+                        ]
+                    ),
+                )
+
                 msg += f"\n┏━━━━━━━━━━━━━━━━╻"
                 msg += f"\n┣🔰𝐍𝐚𝐦𝐞: <code>{downloading_dir_name}</code>"
                 msg += f"\n┣🔰𝐒𝐭𝐚𝐭𝐮𝐬: <i>Downloading...📥</i>"
                 msg += f"\n┃<code>{prog}</code>"
                 msg += f"\n┣🔰𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐝: <code>{file.progress_string()}</code> <b>of</b> <code>{file.total_length_string()}</code>"
                 msg += f"\n┣🔰𝐒𝐩𝐞𝐞𝐝: <code>{file.download_speed_string()}</code>,"
-                msg += f"🔰𝐄𝐓𝐀: <code>{file.eta_string()}</code>"  
+                msg += f"🔰𝐄𝐓𝐀: <code>{file.eta_string()}</code>"
                 #umen = f'<a href="tg://user?id={file.message.from_user.id}">{file.message.from_user.first_name}</a>'
                 #msg += f"\n<b>👤User:</b> {umen} (<code>{file.message.from_user.id}</code>)"
                 #msg += f"\n<b>⚠️Warn:</b> <code>/warn {file.message.from_user.id}</code>"
@@ -227,77 +240,77 @@ async def exec_message_f(client, message):
 
 async def upload_document_f(client, message):
     imsegd = await message.reply_text("processing ...")
-    if message.from_user.id in AUTH_CHANNEL:
-        if " " in message.text:
-            recvd_command, local_file_name = message.text.split(" ", 1)
-            recvd_response = await upload_to_tg(
-                imsegd, local_file_name, message.from_user.id, {}, client
-            )
-            LOGGER.info(recvd_response)
+    if message.from_user.id in AUTH_CHANNEL and " " in message.text:
+        recvd_command, local_file_name = message.text.split(" ", 1)
+        recvd_response = await upload_to_tg(
+            imsegd, local_file_name, message.from_user.id, {}, client
+        )
+        LOGGER.info(recvd_response)
     await imsegd.delete()
 
 
 async def eval_message_f(client, message):
-    if message.from_user.id in AUTH_CHANNEL:
-        status_message = await message.reply_text("Processing ...")
-        cmd = message.text.split(" ", maxsplit=1)[1]
+    if message.from_user.id not in AUTH_CHANNEL:
+        return
+    status_message = await message.reply_text("Processing ...")
+    cmd = message.text.split(" ", maxsplit=1)[1]
 
-        reply_to_id = message.id
-        if message.reply_to_message:
-            reply_to_id = message.reply_to_message.id
+    reply_to_id = message.id
+    if message.reply_to_message:
+        reply_to_id = message.reply_to_message.id
 
-        old_stderr = sys.stderr
-        old_stdout = sys.stdout
-        redirected_output = sys.stdout = io.StringIO()
-        redirected_error = sys.stderr = io.StringIO()
-        stdout, stderr, exc = None, None, None
+    old_stderr = sys.stderr
+    old_stdout = sys.stdout
+    redirected_output = sys.stdout = io.StringIO()
+    redirected_error = sys.stderr = io.StringIO()
+    stdout, stderr, exc = None, None, None
 
-        try:
-            await aexec(cmd, client, message)
-        except Exception:
-            exc = traceback.format_exc()
+    try:
+        await aexec(cmd, client, message)
+    except Exception:
+        exc = traceback.format_exc()
 
-        stdout = redirected_output.getvalue()
-        stderr = redirected_error.getvalue()
-        sys.stdout = old_stdout
-        sys.stderr = old_stderr
+    stdout = redirected_output.getvalue()
+    stderr = redirected_error.getvalue()
+    sys.stdout = old_stdout
+    sys.stderr = old_stderr
 
-        evaluation = ""
-        if exc:
-            evaluation = exc
-        elif stderr:
-            evaluation = stderr
-        elif stdout:
-            evaluation = stdout
-        else:
-            evaluation = "Success"
+    evaluation = ""
+    if exc:
+        evaluation = exc
+    elif stderr:
+        evaluation = stderr
+    elif stdout:
+        evaluation = stdout
+    else:
+        evaluation = "Success"
 
-        final_output = (
-            "<b>EVAL</b>: <code>{}</code>\n\n<b>OUTPUT</b>:\n<code>{}</code> \n".format(
-                cmd, evaluation.strip()
-            )
+    final_output = f"<b>EVAL</b>: <code>{cmd}</code>\n\n<b>OUTPUT</b>:\n<code>{evaluation.strip()}</code> \n"
+
+
+    if len(final_output) > MAX_MESSAGE_LENGTH:
+        with open("eval.text", "w+", encoding="utf8") as out_file:
+            out_file.write(final_output)
+        await message.reply_document(
+            document="eval.text",
+            caption=cmd,
+            disable_notification=True,
+            reply_to_message_id=reply_to_id,
         )
-
-        if len(final_output) > MAX_MESSAGE_LENGTH:
-            with open("eval.text", "w+", encoding="utf8") as out_file:
-                out_file.write(str(final_output))
-            await message.reply_document(
-                document="eval.text",
-                caption=cmd,
-                disable_notification=True,
-                reply_to_message_id=reply_to_id,
-            )
-            os.remove("eval.text")
-            await status_message.delete()
-        else:
-            await status_message.edit(final_output)
+        os.remove("eval.text")
+        await status_message.delete()
+    else:
+        await status_message.edit(final_output)
 
 
 async def aexec(code, client, message):
     exec(
-        f"async def __aexec(client, message): "
-        + "".join(f"\n {l}" for l in code.split("\n"))
+        (
+            "async def __aexec(client, message): "
+            + "".join(f"\n {l}" for l in code.split("\n"))
+        )
     )
+
     return await locals()["__aexec"](client, message)
 
 
@@ -315,16 +328,11 @@ async def upload_log_file(client, message):
         LOGGER.info("Generating LOG Display...")
         logFileLines = logFileRead.read().splitlines()
         toDisplay = 0
-        if len(logFileLines) > 25:
-            toDisplay = 25
-        else:
-            toDisplay = len(logFileLines)
+        toDisplay = min(len(logFileLines), 25)
         startLine = f'Last {toDisplay} Lines : [On Display Telegram LOG]\n\n---------------- START LOG -----------------\n\n'
         endLine = '\n---------------- END LOG -----------------'
         try:
-            Loglines = ''
-            for l in range (toDisplay, 0, -1):
-                Loglines += logFileLines[-l]+'\n\n' ## Max TG send Limit Fix
+            Loglines = ''.join(logFileLines[-l]+'\n\n' for l in range (toDisplay, 0, -1))
             Loglines = Loglines.replace('"', '')
             textLog = startLine+Loglines+endLine
             await message.reply_text(textLog,
@@ -333,7 +341,6 @@ async def upload_log_file(client, message):
         except Exception as err:
             LOGGER.info(f"Error Log Display : {err}")
             LOGGER.info(textLog)
-            pass
         h, m, s = up_time(time.time() - BOT_START_TIME)
         await message.reply_document(LOG_FILE_NAME, caption=f"**Full Log**\n\n**Bot Uptime:** `{h}h, {m}m, {s}s`")
 

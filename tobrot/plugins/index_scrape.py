@@ -14,14 +14,13 @@ nexPageToken = ""
 
 def authorization_token(username, password):
     user_pass = f"{username}:{password}"
-    token ="Basic "+ base64.b64encode(user_pass.encode()).decode()
-    return token
+    return f"Basic {base64.b64encode(user_pass.encode()).decode()}"
 	 	 
 def scrapeURL(payload_input, url, username, password): 
-    global nexPage 
+    global nexPage
     global nexPageToken
-    url = url + "/" if  url[-1] != '/' else url
-    
+    url = f"{url}/" if url[-1] != '/' else url
+
     try: 
         headers = {"authorization":authorization_token(username,password)}
     except Exception as e: 
@@ -32,51 +31,47 @@ def scrapeURL(payload_input, url, username, password):
     enResp = session.post(url, data=payload_input, headers=headers)
     if enResp.status_code == 401: 
         return "Could not Acess your Entered URL!, Check your Username / Password", True
-   
+
     try: 
         deResp = json.loads(base64.b64decode(enResp.text[::-1][24:-20]).decode('utf-8'))
     except Exception as err: 
         LOGGER.info(f"[INDEX SCRAPE] Error : {err}")
         return "Something Went Wrong. Check Index Link / Username / Password Valid or Not", True
-       
-    pagToken = deResp["nextPageToken"] 
-    if pagToken == None: 
-        nexPage = False 
+
+    pagToken = deResp["nextPageToken"]
+    if pagToken is None: 
+        nexPage = False
     else: 
         nexPage = True 
         nexPageToken = pagToken 
 
-    scpText = ""
-   
-    if list(deResp.get("data").keys())[0] == "error": 
+    if list(deResp.get("data").keys())[0] == "error":
         return "Nothing Found in Your Entered URL", True
-    else:
-        file_length = len(deResp["data"]["files"])
-        scpText += f"🗄 <i><b> Total Files : </b></i> {file_length} <br><br>"
-        for i, _ in enumerate(range(file_length)):
-        
-            files_type = deResp["data"]["files"][i]["mimeType"]
-            files_name = deResp["data"]["files"][i]["name"] 
-            if files_type == "application/vnd.google-apps.folder": 
-                #ToDo Directory Inside Directory 😇
+    file_length = len(deResp["data"]["files"])
+    scpText = ""
+
+    scpText += f"🗄 <i><b> Total Files : </b></i> {file_length} <br><br>"
+    for i, _ in enumerate(range(file_length)):
+
+        files_type = deResp["data"]["files"][i]["mimeType"]
+        files_name = deResp["data"]["files"][i]["name"]
+        if files_type != "application/vnd.google-apps.folder":
+            direct_download_link = url + q(files_name)
+            no = i + 1
+            LOGGER.info(direct_download_link)
+            scpText += f"📄 <strong>{no}. {files_name}</strong> : <br><br><pre>🔖 Index Link :<a href='{direct_download_link}'> Index Link </a> <br>"
+            try:
+                files_size = deResp["data"]["files"][i]["size"]
+                scpText += f"<br>📂 Size : {humanbytes(files_size)} | 📋 Type : {files_type} "
+            except:
                 pass
-            else:
-                direct_download_link = url + q(files_name)
-                no = i + 1
-                LOGGER.info(direct_download_link)
-                scpText += f"📄 <strong>{no}. {files_name}</strong> : <br><br><pre>🔖 Index Link :<a href='{direct_download_link}'> Index Link </a> <br>"
-                try:
-                    files_size = deResp["data"]["files"][i]["size"]
-                    scpText += f"<br>📂 Size : {humanbytes(files_size)} | 📋 Type : {files_type} "
-                except:
-                    pass
-                try:
-                    files_time   = deResp["data"]["files"][i]["modifiedTime"]
-                    scpText += f"| ⏰ Modified Time : {files_time}<br><br>"
-                except:
-                    pass
-            scpText += "</pre>"
-        return scpText, False
+            try:
+                files_time   = deResp["data"]["files"][i]["modifiedTime"]
+                scpText += f"| ⏰ Modified Time : {files_time}<br><br>"
+            except:
+                pass
+        scpText += "</pre>"
+    return scpText, False
 	        
 	
 async def index_scrape(client, message):
@@ -86,7 +81,7 @@ async def index_scrape(client, message):
     )
     username = ""
     password = ""
-    user_id_ = message.from_user.id 
+    user_id_ = message.from_user.id
     u_men = message.from_user.mention
     _send = message.text.split(" ", maxsplit=1)
     reply_to = message.reply_to_message
@@ -106,26 +101,23 @@ async def index_scrape(client, message):
         except:
             username="none"
             password="none"
-            pass
     else:
         await lm.edit_text("`Not Provided URL to Scrape`")
         return
     x = 0
-    global body_text 
+    global body_text
     if url:
         body_text = f"<i>🔗 Raw Index Link :</i> <a href='{url}'> Click Here </a> <br>"
     if username != "none" and password != "none":
-        cpass = ""
-        cname = ""
-        for p in range(0, len(password)): cpass += "*"
-        for n in range(0, len(username)): cname += "*"
+        cpass = "".join("*" for _ in range(len(password)))
+        cname = "".join("*" for _ in range(len(username)))
         body_text += f"<i>👤 Username :</i> {cname} <br><i>📟 Password :</i> {cpass} <br><hr><br>"
-    payload = {"page_token":nexPageToken, "page_index": x}	
+    payload = {"page_token":nexPageToken, "page_index": x}
     LOGGER.info(f"Index Scrape Link: {url}")
     body_txt, error = scrapeURL(payload, url, username, password)
 
     body_text += str(body_txt)
-  
+
     if error:
         await lm.delete()
         await message.reply_text(body_txt)

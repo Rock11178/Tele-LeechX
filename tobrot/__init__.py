@@ -71,7 +71,7 @@ logging.getLogger("PIL").setLevel(logging.WARNING)
 
 LOGGER = logging.getLogger(__name__)
 
-user_specific_config=dict()
+user_specific_config = {}
 __version__ = "2.6.0"
 
 # Compulsory Variables >>>>>>>>
@@ -244,19 +244,22 @@ except KeyError:
 # Rclone Config via Root Directory & BackUp >>>>>>>>
 if not os.path.exists("rclone.conf"):
     LOGGER.warning("[NOT FOUND] rclone.conf not found in Root Directory .")
-if os.path.exists("rclone.conf"):
-    if not os.path.exists("rclone_bak.conf"):  # Remake and BackUp rclone.conf file
-        with open("rclone_bak.conf", "w+", newline="\n", encoding="utf-8") as fole:
-            with open("rclone.conf", "r") as f:
-                fole.write(f.read())
-        LOGGER.info("[SUCCESS] rclone.conf BackUped to rclone_bak.conf!")
+if os.path.exists("rclone.conf") and not os.path.exists("rclone_bak.conf"):
+    with open("rclone_bak.conf", "w+", newline="\n", encoding="utf-8") as fole:
+        with open("rclone.conf", "r") as f:
+            fole.write(f.read())
+    LOGGER.info("[SUCCESS] rclone.conf BackUped to rclone_bak.conf!")
 
 # Pyrogram Client Intialization >>>>>>>>>>>
 app = Client("LeechBot", bot_token=TG_BOT_TOKEN, api_id=APP_ID, api_hash=API_HASH, workers=343)
 isUserPremium = False
 if len(STRING_SESSION) > 10:
-    userBot = Client("Tele-UserBot", api_id=APP_ID, api_hash=API_HASH, session_string=STRING_SESSION)
-    if userBot:
+    if userBot := Client(
+        "Tele-UserBot",
+        api_id=APP_ID,
+        api_hash=API_HASH,
+        session_string=STRING_SESSION,
+    ):
         userBot.start()
         if (userBot.get_me()).is_premium:
             isUserPremium = True
@@ -264,7 +267,8 @@ if len(STRING_SESSION) > 10:
         else:
             isUserPremium = False
             LOGGER.info("[SUCCESS] Initiated UserBot : Non-Premium Mode. Add Premium Account StringSession to Use 4GB Upload. ")
-    else: LOGGER.warning("[FAILED] Userbot Not Started. ReCheck Your STRING_SESSION, and Other Vars")
+    else:
+        LOGGER.warning("[FAILED] Userbot Not Started. ReCheck Your STRING_SESSION, and Other Vars")
 else: LOGGER.info("Provide or ReGenerate Your STRING_SESSION Var")
 
 updater = tg.Updater(token=TG_BOT_TOKEN)
