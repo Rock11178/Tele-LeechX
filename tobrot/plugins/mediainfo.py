@@ -87,7 +87,6 @@ async def mediainfo(client, message):
         if reply_to.media:
             for kind in available_media:
                 x_media = getattr(reply_to, kind, None)
-                LOGGER.info(x_media)
                 if x_media is not None:
                     TG_MEDIA = True
                     break
@@ -107,7 +106,6 @@ async def mediainfo(client, message):
 
     if TG_MEDIA:
         media_type = str(type(x_media)).split("'")[1]
-        LOGGER.info(media_type)
         file_path = safe_filename(await reply_to.download())
         output_ = await runcmd(f'mediainfo "{file_path}"')
     elif DIRECT_LINK:
@@ -121,6 +119,7 @@ async def mediainfo(client, message):
 <h2>DETAILS</h2>
 <pre>{out or 'Not Supported'}</pre>
 """
+    LOGGER.info(out)
     if DIRECT_LINK:
         title = unquote(link.split('/')[-1])
     else:
@@ -130,7 +129,7 @@ async def mediainfo(client, message):
     if TG_MEDIA:
         text_ = str(media_type.split(".")[-1])
         LOGGER.info(text_)
-        textup = f"""
+        textup = f'''
 ℹ️ <code>MEDIA INFO</code> ℹ
 ┃
 ┃• <b>File Name :</b> <code>{x_media['file_name']}</code>
@@ -138,10 +137,10 @@ async def mediainfo(client, message):
 ┃• <b>File Size :</b> <code>{humanbytes(x_media['file_size'])}</code>
 ┃• <b>Date :</b> <code>{datetime.datetime.utcfromtimestamp(x_media['date']).strftime('%I:%M:%S %p %d %B, %Y')}</code>
 ┃• <b>File ID :</b> <code>{x_media['file_id']}</code>
-┃• <b>Media Type :</b> <code>None</code>
+┃• <b>Media Type :</b> <code>{text_}</code>
 ┃
 ┗━♦️ℙ𝕠𝕨𝕖𝕣𝕖𝕕 𝔹𝕪 {UPDATES_CHANNEL}♦️━╹
-"""
+'''
     elif DIRECT_LINK:
         textup = f"""
 ℹ️ <code>DIRECT LINK INFO</code> ℹ
