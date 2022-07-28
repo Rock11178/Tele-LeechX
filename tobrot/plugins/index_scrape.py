@@ -58,9 +58,7 @@ def scrapeURL(payload_input, url, username, password):
             files_type = deResp["data"]["files"][i]["mimeType"]
             files_name = deResp["data"]["files"][i]["name"] 
             if files_type == "application/vnd.google-apps.folder": 
-                #ddl = url + q(file_name) + "/"
-                #scpText += f"Directory : {ddl}"
-                #scrapeURL(payload, ddl) #ToDo Directory Inside Directory 
+                #ToDo Directory Inside Directory 😇
                 pass
             else:
                 direct_download_link = url + q(files_name)
@@ -105,10 +103,6 @@ async def index_scrape(client, message):
         try:
             username = _lin[1]
             password = _lin[2]
-            #try: await message.delete()
-            #except: pass
-            #try: await message.reply_to_message.delete()
-            #except: pass
         except:
             username="none"
             password="none"
