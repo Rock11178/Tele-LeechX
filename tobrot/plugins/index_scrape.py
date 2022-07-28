@@ -2,6 +2,7 @@ import base64
 import json
 import cloudscraper
 
+from telegraph import Telegraph
 from urllib.parse import quote as q
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -143,7 +144,17 @@ async def index_scrape(client, message):
         x += 1
 
     title = "Index Link Scrapper"
-    tgh_link = post_to_telegraph(title, body_text)
+    #tgh_link = post_to_telegraph(title, body_text)
+
+    telegraph = Telegraph()
+    telegraph.create_account(short_name='mystery')
+    response = telegraph.create_page(
+        title= "Index Link Scrapper",
+        html_content=body_text,
+        author_name='Tele-LeechX',
+        author_url='https://t.me/FXTorrentz'
+    )
+    tgh_link = response['url'])
 
     textup = f"""
 ┏━📮  𝗜𝗻𝗱𝗲𝘅 𝗦𝗰𝗿𝗮𝗽𝗲 𝗥𝗲𝘀𝘂𝗹𝘁 :
