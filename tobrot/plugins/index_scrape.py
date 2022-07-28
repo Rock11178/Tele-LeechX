@@ -5,7 +5,7 @@ import cloudscraper
 from urllib.parse import quote as q
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from tobrot import LOGGER, INDEX_SCRAPE
+from tobrot import LOGGER, UPDATES_CHANNEL
 from tobrot.helper_funcs.display_progress import humanbytes
 from tobrot.plugins.mediainfo import post_to_telegraph
 
