@@ -154,7 +154,7 @@ async def index_scrape(client, message):
         author_name='Tele-LeechX',
         author_url='https://t.me/FXTorrentz'
     )
-    tgh_link = response['url'])
+    tgh_link = response['url']
 
     textup = f"""
 ┏━📮  𝗜𝗻𝗱𝗲𝘅 𝗦𝗰𝗿𝗮𝗽𝗲 𝗥𝗲𝘀𝘂𝗹𝘁 :
