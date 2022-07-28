@@ -130,7 +130,7 @@ async def index_scrape(client, message):
         body_text += f"<i>👤 Username :</i> {cname} <br><i>📟 Password :</i> {cpass} <br><hr><br>"
     payload = {"page_token":nexPageToken, "page_index": x}	
     LOGGER.info(f"Index Scrape Link: {url}")
-    body_text, error += str(scrapeURL(payload, url, username, password)
+    body_text, error += str(scrapeURL(payload, url, username, password))
   
     if error:
         await lm.delete()
