@@ -15,6 +15,7 @@ import datetime
 
 from urllib.parse import unquote
 from html_telegraph_poster import TelegraphPoster
+from telegraph import Telegraph
 from pyrogram import filters, enums
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -24,7 +25,7 @@ from tobrot.helper_funcs.display_progress import humanbytes
 from tobrot.helper_funcs.bot_commands import BotCommands
 
 
-def post_to_telegraph(a_title: str, content: str) -> str:
+def post_to_telegraph_html(a_title: str, content: str) -> str:
     """ Create a Telegram Post using HTML Content """
     post_client = TelegraphPoster(use_api=True)
     post_client.create_api_token(TGH_AUTHOR)
@@ -35,6 +36,18 @@ def post_to_telegraph(a_title: str, content: str) -> str:
         text=content,
     )
     return post_page["url"]
+
+def post_to_telegraph(title_input: str, body_text: str) -> str:
+    """ Create a Telegram Post using Telegraph HTML Content """
+    telegraph = Telegraph()
+    telegraph.create_account(short_name=TGH_AUTHOR)
+    response = telegraph.create_page(
+        title=title_input,
+        html_content=body_text,
+        author_name=TGH_AUTHOR,
+        author_url=TGH_AUTHOR_URL
+    )
+    return response['url']
 
 def safe_filename(path_):
     if path_ is None:
@@ -112,7 +125,7 @@ async def mediainfo(client, message):
         title = unquote(link.split('/')[-1])
     else:
         title = "FX Mediainfo"
-    tgh_link = post_to_telegraph(title, body_text)
+    tgh_link = post_to_telegraph_html(title, body_text)
 
     if TG_MEDIA:
         text_ = media_type.split(".")[-1]
