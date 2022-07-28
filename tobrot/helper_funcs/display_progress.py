@@ -112,17 +112,20 @@ class Progress:
                 logger.info(ou)
 
 
-def humanbytes(size):
+def humanbytes(size_wf) -> str:
+    size = int(size_wf)
     if not size:
         return ""
     power = 2 ** 10
-    n = 0
-    Dic_powerN = {0: " ", 1: "K", 2: "M", 3: "G", 4: "T"}
+    ind = 0
+    SIZE_UNITS = {0: "", 1: "K", 2: "M", 3: "G", 4: "T", 5: "P", 6: "E", 7: "Z", 8: "Y"}
     while size > power:
         size /= power
-        n += 1
-    return str(round(size, 2)) + " " + Dic_powerN[n] + "B"
-
+        ind += 1
+    try:
+        return str(round(size, 2)) + " " + SIZE_UNITS[ind] + "B"
+    except IndexError:
+        return 'File too large'
 
 def TimeFormatter(milliseconds: int) -> str:
     seconds, milliseconds = divmod(int(milliseconds), 1000)
