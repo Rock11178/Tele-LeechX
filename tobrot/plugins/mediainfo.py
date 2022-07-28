@@ -138,7 +138,7 @@ async def mediainfo(client, message):
 ┃• <b>File Size :</b> <code>{humanbytes(x_media['file_size'])}</code>
 ┃• <b>Date :</b> <code>{datetime.datetime.utcfromtimestamp(x_media['date']).strftime('%I:%M:%S %p %d %B, %Y')}</code>
 ┃• <b>File ID :</b> <code>{x_media['file_id']}</code>
-┃• <b>Media Type :</b> <code>{text_}</code>
+┃• <b>Media Type :</b> <code>None</code>
 ┃
 ┗━♦️ℙ𝕠𝕨𝕖𝕣𝕖𝕕 𝔹𝕪 {UPDATES_CHANNEL}♦️━╹
 """
