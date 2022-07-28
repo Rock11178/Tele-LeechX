@@ -98,7 +98,7 @@ async def index_scrape(client, message):
     url = ""
     if txt != "":
         _lin = txt.split("\n")
-        url = _lin[0].stripe()
+        url = _lin[0]
         try:
             username = _lin[1]
             password = _lin[2]
