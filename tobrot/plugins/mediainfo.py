@@ -106,7 +106,7 @@ async def mediainfo(client, message):
     process = await message.reply_text("`Gᴇɴᴇʀᴀᴛɪɴɢ ...`")
 
     if TG_MEDIA:
-        media_type = str(type(x_media)).split("'")[1]
+        media_type = str(x_media).split("'")[1]
         LOGGER.info(media_type)
         file_path = safe_filename(await reply_to.download())
         output_ = await runcmd(f'mediainfo "{file_path}"')
