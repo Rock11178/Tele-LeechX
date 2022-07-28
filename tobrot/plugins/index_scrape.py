@@ -52,7 +52,7 @@ def scrapeURL(payload_input, url, username, password):
         return "Nothing Found in Your Entered URL", True
     else:
         file_length = len(deResp["data"]["files"])
-        scpText += f"🗄 <i><b> Total Files : </b></i> {file_length} <br><br>"
+        scpText += f"<i><b> Total Files : </b></i> {file_length} <br><br>"
         for i, _ in enumerate(range(file_length)):
         
             files_type = deResp["data"]["files"][i]["mimeType"]
@@ -66,17 +66,15 @@ def scrapeURL(payload_input, url, username, password):
                 direct_download_link = url + q(files_name)
                 no = i + 1
                 LOGGER.info(direct_download_link)
-                scpText += f"📄 <strong>{no}. {files_name}</strong> : <br><br><pre>🔖 Index Link : <a href='{direct_download_link}'> Index Link </a> <br>"
+                scpText += f"📄 <strong> {no}. {files_name}</strong> : <br><br><pre>🔖 Index Link : <a href='{direct_download_link}'>{direct_download_link}</a> <br>"
                 try:
                     files_size = deResp["data"]["files"][i]["size"]
-                    if files_size:
-                        scpText += f"<br>📂 Size : {humanbytes(files_size)} | 📋 Type : {files_type} "
+                    scpText += f"<br>📂 Size : {humanbytes(files_size)} | 📋 Type : {files_type} "
                 except:
                     pass
                 try:
-                    files_time   = deResp["data"]["files"][i]["modifiedTime"] 
-                    if files_time:
-                        scpText += f"| ⏰ Modified Time : {files_time}<br><br>"
+                    files_time   = deResp["data"]["files"][i]["modifiedTime"]
+                    scpText += f"| ⏰ Modified Time : {files_time}<br><br>"
                 except:
                     pass
             scpText += "</pre>"
@@ -131,11 +129,12 @@ async def index_scrape(client, message):
     payload = {"page_token":nexPageToken, "page_index": x}	
     LOGGER.info(f"Index Scrape Link: {url}")
     body_txt, error = scrapeURL(payload, url, username, password)
+
     body_text += str(body_txt)
   
     if error:
         await lm.delete()
-        await message.reply_text(body_text)
+        await message.reply_text(body_txt)
         return
 
     while nexPage == True: #Not to be Executed 
